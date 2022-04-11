@@ -27,7 +27,9 @@ The individual messenger application worked on solely by myself includes:
 	3. index.html
 
 The messengerdb.js file is the database connection for the chatserver program. It allows users and messages to be stored within the database.
+
 The index.html file is the website's main page for login, registration, and chatrooms.
+
 The ChatServer.js is the server file handling all of the backend of the program. Including handling chat messages, login/registration, and storing/loading database information.
 
 # Project Management Information
