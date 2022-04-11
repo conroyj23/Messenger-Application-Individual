@@ -1,0 +1,36 @@
+# This is an example Starter pipeline configuration
+# Use a skeleton to build, test and deploy using manual and parallel steps
+# -----
+# You can specify a custom docker image from Docker Hub as your build environment.
+
+image: atlassian/default-image:3
+
+pipelines:
+  default:
+    # The following deployment steps will be executed for each pipeline run. To configure your steps and conditionally deploy see https://support.atlassian.com/bitbucket-cloud/docs/configure-bitbucket-pipelinesyml/
+    - step:
+        name: 'Deployment to Staging'
+        deployment: staging
+        services: 
+          - docker
+        script:
+          - echo $HEROKU_API_KEY
+          - curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
+          - heroku container:login
+          - cd labs/docker-lab # just for your CPS490-Lab 5, change the directory if needed
+          - echo "staging version by conroyj4@udayton.edu"
+          - heroku container:push web -a $HEROKU_STAGING_APP_NAME # a new Heroku app for Testing only
+          - heroku container:release web -a $HEROKU_STAGING_APP_NAME # a new Heroku app for Testing only
+    - step:
+        name: 'Deployment to Production'
+        deployment: production
+        trigger: 'manual'
+        services:
+          - docker
+        script:
+          - echo $HEROKU_API_KEY
+          - curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
+          - heroku container:login
+          - cd labs/docker-lab
+          - heroku container:push web -a $HEROKU_APP_NAME
+          - heroku container:release web -a $HEROKU_APP_NAME

@@ -1,0 +1,30 @@
+{
+    "name": "messenger",
+    "version": "1.0.0",
+    "description": "Messenger Node.js App for CPS490 - by John Conroy",
+    "main": "ChatServer.js",
+    "scripts": {
+        "test": "node ChatServer.js",
+        "start": "node ChatServer.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://bitbucket.org/conroyj4/cps490-conroyj4.git"
+    },
+    "keywords": [
+        "Node.js",
+        "Socket.io",
+        "Capstone"
+    ],
+    "author": "John Conroy",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://bitbucket.org/conroyj4/cps490-conroyj4/issues"
+    },
+    "homepage": "https://bitbucket.org/conroyj4/cps490-conroyj4#readme",
+    "dependencies": {
+        "express": "^4.17.1",
+        "mongodb": "^4.1.4",
+        "socket.io": "^2.3.0"
+    }
+}

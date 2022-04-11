@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Messenger 0.5<</title>
+</head>
+
+<body>
+    <h1>Messenger 0.5 – Production version</h1>
+    <p>Developed by John Conroy in CPS490</p>
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- the main UI here -->
+    <div id="loginUI">
+        <div style="display:block;" id="loginScreen">
+            Please login first: <br>
+            <input type="text" id="username" placeholder="Enter your name ...">
+            <input type="password" id="password" placeholder="Password">
+            <button type="button" onclick="login()">JOIN</button>
+            <div id="invalidLoginDiv" style="color:red;font-size:20px;"></div>
+            <br><a href="#" onclick="showRegistrationScreen();hideLoginScreen()">
+            Do not have an account? Register here! </a>
+        </div>
+        
+        <div style="display:none;" id="registrationScreen">
+            Register your account: <br>
+            <input type="text" id="newusername" placeholder="Enter your email as username ...">
+            <input type="password" id="newpassword" placeholder="Select your password ...">
+            <button type="button"onclick="register()">Register User</button><br>
+            <a href="#" onclick="hideRegistrationScreen();showLoginScreen()"> Login? </a>
+        </div>
+
+        <script>
+            var socketio = io();
+            function login() {
+                var username = document.getElementById('username').value;
+                var password = document.getElementById('password').value;
+                if (socketio)
+                    socketio.emit("login", username, password);
+            }
+            socketio.on("Welcome", (welcomemessage) => {
+                document.getElementById('messages').innerHTML += welcomemessage + "<br>";
+            });
+            socketio.on("authenticated", () => {
+                document.getElementById("loginUI").style.display = "none";
+                document.getElementById("invalidLoginDiv").style.display = "none";
+                
+                document.getElementById("chatUI").style.display = "block";
+                document.getElementById('messages').innerHTML +=
+                    "You are successfully logged in! Can start chatting now.<br>";
+            });
+            socketio.on("invalidLogin", () => {
+                document.getElementById("invalidLoginDiv").innerHTML = "Invalid Login - Please try again.";
+                //setTimeout(function(){document.getElementById("invalidLoginDiv").innerHTML = "<br>";},5000);
+            });
+
+            socketio.on("chat_history",(chat_history) => {
+            //debug if needed: e.g., JSON.stringify(chat_history))
+                if(chat_history && chat_history.length > 0){
+                    for(let index in chat_history){
+                        let chatmessage = chat_history[index].message;
+                        let time = new Date(chat_history[index].timestamp);
+                        document.getElementById('messages').innerHTML+="On " + time + "," + chatmessage + "<br>";
+                    }
+                }
+            });
+
+            function register(){
+                var username = document.getElementById('newusername').value;
+                var password = document.getElementById('newpassword').value;
+                //TODO: validate username/password
+                socketio.emit("register",username,password);
+            }
+            socketio.on("registration", (result) => {
+                var username = document.getElementById('newusername').value;
+                if(result==="Success"){
+                    alert("New account created with username: " + username + "\nYou can login now!");
+                    hideRegistrationScreen();
+                    showLoginScreen();
+                    return
+                }
+                if(result==="UserExist"){
+                    alert("Username '" + username + "' exists. Please try again!" );
+                }else{
+                    alert("User registration error. Please try again!" );
+                }
+                document.getElementById('newusername').value="";
+                document.getElementById('newpassword').value="";
+                document.getElementById('newusername').focus();
+            })
+            function hideRegistrationScreen(){
+                var registrationScreen = document.getElementById("registrationScreen");
+                registrationScreen.style.display = "none";//"block" is to display
+            }
+
+            function showRegistrationScreen(){
+                var registrationScreen = document.getElementById("registrationScreen");
+                registrationScreen.style.display = "block";//"none" is to hide
+            }
+
+            function hideLoginScreen(){
+                var loginScreen = document.getElementById("loginScreen");
+                loginScreen.style.display = "none";//"block" is to display
+            }
+
+            function showLoginScreen(){
+                var loginScreen = document.getElementById("loginScreen");
+                loginScreen.style.display = "block";//"none" is to hide
+            }
+        </script>
+        <br>
+    </div>
+
+    <div id="chatUI" style="display:none;">
+        Your Message:
+        <input type="text" id="message" placeholder="Enter your message ...">
+        <button type="button" onclick="sendmessage()">Send</button>
+        <div id="messages"></div>
+        <script>
+            function sendmessage() {
+                socketio.emit("chat", document.getElementById('message').value);
+            }
+            socketio.on("chat", (chatmessage) => {
+                document.getElementById('messages').innerHTML += chatmessage + "<br>";
+            });
+        </script>
+    </div>
+
+</body>
+
+</html>
